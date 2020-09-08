@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+    mysql:
+        image: mysql:8.0.21
+        restart: always
+        command: --default-authentication-plugin=mysql_native_password
+        ports:
+            - 3306:3306
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            GHOST_DATABASE: ${GHOST_DATABASE}
+            YOURLS_DATABASE: ${YOURLS_DATABASE}
+        volumes:
+            - ./mysql/data:/var/lib/mysql
+            - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    nginx:
+        image: nginx:1.19.2-alpine
+        restart: always
+        ports:
+            - 80:80
+            - 443:443
+        depends_on:
+            - ghost
+            - yourls
+        environment:
+            GHOST_HOST: ${GHOST_HOST}
+            GHOST_PORT: ${GHOST_PORT}
+            YOURLS_HOST: ${YOURLS_HOST}
+            YOURLS_PORT: ${YOURLS_PORT}
+        volumes:
+            - ./nginx/templates:/etc/nginx/templates
+            - yourls:/var/www/html
+    ghost:
+        image: ghost:3.31.5-alpine
+        restart: always
+        depends_on:
+            - mysql
+        environment:
+            database__client: mysql
+            database__connection__host: mysql
+            database__connection__user: ${MYSQL_USER}
+            database__connection__password: ${MYSQL_PASSWORD}
+            database__connection__database: ${GHOST_DATABASE}
+            url: http://${GHOST_HOST}
+    yourls:
+        image: yourls:1.7.9-fpm-alpine
+        restart: always
+        depends_on:
+            - mysql
+        environment:
+            YOURLS_DB_HOST: mysql
+            YOURLS_DB_USER: ${MYSQL_USER}
+            YOURLS_DB_PASS: ${MYSQL_PASSWORD}
+            YOURLS_DB_NAME: ${YOURLS_DATABASE}
+            YOURLS_SITE: http://${YOURLS_HOST}
+            YOURLS_USER: ${YOURLS_USER}
+            YOURLS_PASS: ${YOURLS_PASS}
+        volumes:
+            - yourls:/var/www/html
+
+volumes:
+    yourls:
