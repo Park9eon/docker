@@ -21,7 +21,9 @@ server {
     server_name ${RSS_HOST};
 
     location / {
-        proxy_pass http://ghost:${RSS_PORT};
+        proxy_pass http://localhost:${RSS_PORT};
+        proxy_set_header Host      $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 
     ssl_certificate /etc/letsencrypt/live/${RSS_HOST}/fullchain.pem;

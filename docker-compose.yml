@@ -59,6 +59,8 @@ services:
             YOURLS_PORT: ${YOURLS_PORT}
             RSS_HOST: ${RSS_HOST}
             RSS_PORT: ${RSS_PORT}
+        depends_on:
+            - certbot
         volumes:
             - ./nginx/templates:/etc/nginx/templates
             - ./certbot/data/conf:/etc/letsencrypt
@@ -66,6 +68,10 @@ services:
             - yourls:/var/www/html
     certbot:
         image: certbot/certbot
+        network_mode: host
+        volumes:
+            - ./certbot/data/conf:/etc/letsencrypt
+            - ./certbot/data/www:/var/www/certbot
     ghost:
         image: ghost:3.31.5-alpine
         restart: always
@@ -97,6 +103,7 @@ services:
         image: docker.pkg.github.com/park9eon/red-discordbot-docker/redbot:latest
         depends_on:
             - postgres
+        network_mode: host
         environment:
             REDBOT_NAME: redbot
             REDBOT_STORAGE_TYPE: POSTGRES
@@ -111,10 +118,11 @@ services:
         depends_on:
             - mongo
             - redis
+        network_mode: host
         environment:
             DRSS_START: bot-web
-            MONGODB_URI: mongodb://mongo:27017/${RSS_DATABASE}
-            REDIS_URL: redis://redis:6379
+            MONGODB_URI: mongodb://localhost:27017/${RSS_DATABASE}
+            REDIS_URL: redis://localhost:6379
             DRSS_BOT_TOKEN: ${DISCORD_TOKEN}
             DRSS_BOT_PREFIX: "~"
             DRSS_BOT_OWNERIDS: park9eon#5132
