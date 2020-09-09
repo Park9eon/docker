@@ -61,7 +61,11 @@ services:
             RSS_PORT: ${RSS_PORT}
         volumes:
             - ./nginx/templates:/etc/nginx/templates
+            - ./certbot/data/conf:/etc/letsencrypt
+            - ./certbot/data/www:/var/www/certbot
             - yourls:/var/www/html
+    certbot:
+        image: certbot/certbot
     ghost:
         image: ghost:3.31.5-alpine
         restart: always
