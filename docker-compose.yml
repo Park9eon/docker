@@ -51,14 +51,14 @@ services:
         depends_on:
             - wordpress
             - yourls
-            - rss
+            - rssbot
         environment:
             WORDPRESS_HOST: ${WORDPRESS_HOST}
             WORDPRESS_PORT: ${WORDPRESS_PORT}
             YOURLS_HOST: ${YOURLS_HOST}
             YOURLS_PORT: ${YOURLS_PORT}
-            RSS_HOST: ${RSS_HOST}
-            RSS_PORT: ${RSS_PORT}
+            RSSBOT_HOST: ${RSSBOT_HOST}
+            RSSBOT_PORT: ${RSSBOT_PORT}
         depends_on:
             - certbot
         volumes:
