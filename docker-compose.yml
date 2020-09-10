@@ -52,6 +52,7 @@ services:
             - wordpress
             - yourls
             - rssbot
+            - certbot
         environment:
             WORDPRESS_HOST: ${WORDPRESS_HOST}
             WORDPRESS_PORT: ${WORDPRESS_PORT}
@@ -59,8 +60,6 @@ services:
             YOURLS_PORT: ${YOURLS_PORT}
             RSSBOT_HOST: ${RSSBOT_HOST}
             RSSBOT_PORT: ${RSSBOT_PORT}
-        depends_on:
-            - certbot
         volumes:
             - ./nginx/templates:/etc/nginx/templates
             - ./certbot/data/conf:/etc/letsencrypt
