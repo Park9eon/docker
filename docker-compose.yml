@@ -125,7 +125,7 @@ services:
             REDIS_URL: redis://localhost:6379
             DRSS_BOT_TOKEN: ${DISCORD_TOKEN}
             DRSS_BOT_PREFIX: ${RSSBOT_PREFIX}
-            DRSS_BOT_OWNERIDS: park9eon#5132
+            DRSS_BOT_OWNERIDS: ${RSSBOT_OWNERIDS}
             DRSSWEB_BOT_TOKEN: ${DISCORD_TOKEN}
             DRSSWEB_HTTP_PORT: ${RSSBOT_PORT}
             DRSSWEB_BOT_REDIRECTURI: ${DISCORD_REDIRECT_URI}
