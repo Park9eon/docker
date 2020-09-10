@@ -2,16 +2,16 @@ server {
 
     listen 443 ssl;
     listen [::]:443 ssl;
-    server_name ${YOURLS_HOST};
+    server_name ${RSSBOT_HOST};
 
     location / {
-        proxy_pass http://yourls:${YOURLS_PORT};
+        proxy_pass http://localhost:${RSSBOT_PORT};
         proxy_set_header Host      $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
 
-    ssl_certificate /etc/letsencrypt/live/${YOURLS_HOST}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/${YOURLS_HOST}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${RSSBOT_HOST}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${RSSBOT_HOST}/privkey.pem;
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -21,9 +21,7 @@ server {
 
     listen 80;
     listen [::]:80;
-    server_name ${YOURLS_HOST};
-
-    root /var/www/html;
+    server_name ${RSSBOT_HOST};
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;

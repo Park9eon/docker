@@ -12,7 +12,7 @@ services:
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
-            GHOST_DATABASE: ${GHOST_DATABASE}
+            WORDPRESS_DATABASE: ${WORDPRESS_DATABASE}
             YOURLS_DATABASE: ${YOURLS_DATABASE}
         volumes:
             - ./mysql/data:/var/lib/mysql
@@ -49,12 +49,12 @@ services:
             - 80:80
             - 443:443
         depends_on:
-            - ghost
+            - wordpress
             - yourls
             - rss
         environment:
-            GHOST_HOST: ${GHOST_HOST}
-            GHOST_PORT: ${GHOST_PORT}
+            WORDPRESS_HOST: ${WORDPRESS_HOST}
+            WORDPRESS_PORT: ${WORDPRESS_PORT}
             YOURLS_HOST: ${YOURLS_HOST}
             YOURLS_PORT: ${YOURLS_PORT}
             RSS_HOST: ${RSS_HOST}
@@ -72,20 +72,18 @@ services:
         volumes:
             - ./certbot/data/conf:/etc/letsencrypt
             - ./certbot/data/www:/var/www/certbot
-    ghost:
-        image: ghost:3.31.5-alpine
+    wordpress:
+        image: wordpress:5.5.1-php7.3-fpm-alpine
         restart: always
         depends_on:
             - mysql
         environment:
-            database__client: mysql
-            database__connection__host: mysql
-            database__connection__user: ${MYSQL_USER}
-            database__connection__password: ${MYSQL_PASSWORD}
-            database__connection__database: ${GHOST_DATABASE}
-            url: http://${GHOST_HOST}
+            WORDPRESS_DB_HOST: mysql
+            WORDPRESS_DB_USER: ${MYSQL_USER}
+            WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+            WORDPRESS_DB_NAME: ${WORDPRESS_DATABASE}
         volumes:
-            - ./ghost/data:/var/lib/ghost/content
+            - ./wordpress/data:/var/www/html
     yourls:
         image: yourls:1.7.9-fpm-alpine
         restart: always
@@ -105,31 +103,31 @@ services:
         image: docker.pkg.github.com/park9eon/red-discordbot-docker/redbot:latest
         depends_on:
             - postgres
-        network_mode: host
+        network_mode: host  # use socket
         environment:
             REDBOT_NAME: redbot
             REDBOT_STORAGE_TYPE: POSTGRES
             REDBOT_TOKEN: ${DISCORD_TOKEN}
-            REDBOT_PREFIX: "!"
+            REDBOT_PREFIX: ${REDBOT_PREFIX}
             REDBOT_DB_HOST: postgres
             REDBOT_DB_USER: ${POSTGRES_USER}
             REDBOT_DB_PASS: ${POSTGRES_PASSWORD}
             REDBOT_DB_NAME: ${POSTGRES_DB}
-    rss: # Don`t set restart: always
+    rssbot: # Don`t set restart: always
         image: synzen/monitorss
         depends_on:
             - mongo
             - redis
-        network_mode: host
+        network_mode: host # use socket
         environment:
             DRSS_START: bot-web
-            MONGODB_URI: mongodb://localhost:27017/${RSS_DATABASE}
+            MONGODB_URI: mongodb://localhost:27017/${RSSBOT_DATABASE}
             REDIS_URL: redis://localhost:6379
             DRSS_BOT_TOKEN: ${DISCORD_TOKEN}
-            DRSS_BOT_PREFIX: "~"
+            DRSS_BOT_PREFIX: ${RSSBOT_PREFIX}
             DRSS_BOT_OWNERIDS: park9eon#5132
             DRSSWEB_BOT_TOKEN: ${DISCORD_TOKEN}
-            DRSSWEB_HTTP_PORT: ${RSS_PORT}
+            DRSSWEB_HTTP_PORT: ${RSSBOT_PORT}
             DRSSWEB_BOT_REDIRECTURI: ${DISCORD_REDIRECT_URI}
             DRSSWEB_BOT_CLIENTID: ${DISCORD_CLIENT_ID}
             DRSSWEB_BOT_CLIENTSECRET: ${DISCORD_CLIENT_SECRET}
