@@ -65,7 +65,8 @@ services:
             - ./nginx/templates:/etc/nginx/templates
             - ./certbot/data/conf:/etc/letsencrypt
             - ./certbot/data/www:/var/www/certbot
-            - yourls:/var/www/html
+            - ./wordpress/data:/var/www/wordpress
+            - yourls:/var/www/yourls
     certbot:
         image: certbot/certbot
         network_mode: host

@@ -4,6 +4,8 @@ server {
     listen [::]:443 ssl;
     server_name ${WORDPRESS_HOST};
 
+    root /var/www/wordpress;
+
     location / {
         proxy_pass http://wordpress:${WORDPRESS_HOST};
         proxy_set_header Host      $host;

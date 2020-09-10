@@ -4,6 +4,8 @@ server {
     listen [::]:443 ssl;
     server_name ${YOURLS_HOST};
 
+    root /var/www/yourls;
+
     location / {
         proxy_pass http://yourls:${YOURLS_PORT};
         proxy_set_header Host      $host;
@@ -22,8 +24,6 @@ server {
     listen 80;
     listen [::]:80;
     server_name ${YOURLS_HOST};
-
-    root /var/www/html;
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
