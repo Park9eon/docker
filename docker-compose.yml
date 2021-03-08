@@ -42,63 +42,22 @@ services:
             - 16379:16379
         volumes:
             - ./redis/data:/data
-    nginx:
-        image: nginx:1.19.2-alpine
-        restart: always
-        ports:
-            - 80:80
-            - 443:443
-        depends_on:
-            - wordpress
-            - yourls
-            - rssbot
-            - certbot
-        environment:
-            WORDPRESS_HOST: ${WORDPRESS_HOST}
-            WORDPRESS_PORT: ${WORDPRESS_PORT}
-            YOURLS_HOST: ${YOURLS_HOST}
-            YOURLS_PORT: ${YOURLS_PORT}
-            RSSBOT_HOST: ${RSSBOT_HOST}
-            RSSBOT_PORT: ${RSSBOT_PORT}
-        volumes:
-            - ./nginx/templates:/etc/nginx/templates
-            - ./certbot/data/conf:/etc/letsencrypt
-            - ./certbot/data/www:/var/www/certbot
-            - ./wordpress/data:/var/www/wordpress
-            - yourls:/var/www/yourls
-    certbot:
-        image: certbot/certbot
-        network_mode: host
-        volumes:
-            - ./certbot/data/conf:/etc/letsencrypt
-            - ./certbot/data/www:/var/www/certbot
     wordpress:
-        image: wordpress:5.5.1-php7.3-fpm-alpine
+        image: wordpress:5.6.2-php7.3-fpm-alpine
         restart: always
         depends_on:
             - mysql
+        ports:
+            - 9000:9000
         environment:
             WORDPRESS_DB_HOST: mysql
             WORDPRESS_DB_USER: ${MYSQL_USER}
             WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
             WORDPRESS_DB_NAME: ${WORDPRESS_DATABASE}
+            AWS_S3_KEY_ID: ${AWS_S3_KEY_ID}
+            AWS_S3_SECRET_KEY: ${AWS_S3_SECRET_KEY}
         volumes:
-            - ./wordpress/data:/var/www/html
-    yourls:
-        image: yourls:1.7.9-fpm-alpine
-        restart: always
-        depends_on:
-            - mysql
-        environment:
-            YOURLS_DB_HOST: mysql
-            YOURLS_DB_USER: ${MYSQL_USER}
-            YOURLS_DB_PASS: ${MYSQL_PASSWORD}
-            YOURLS_DB_NAME: ${YOURLS_DATABASE}
-            YOURLS_SITE: http://${YOURLS_HOST}
-            YOURLS_USER: ${YOURLS_USER}
-            YOURLS_PASS: ${YOURLS_PASS}
-        volumes:
-            - yourls:/var/www/html
+            - /var/www/wordpress:/var/www/html
     redbot: # Don`t set restart: always
         image: docker.pkg.github.com/park9eon/red-discordbot-docker/redbot:latest
         depends_on:
@@ -109,7 +68,7 @@ services:
             REDBOT_STORAGE_TYPE: POSTGRES
             REDBOT_TOKEN: ${DISCORD_TOKEN}
             REDBOT_PREFIX: ${REDBOT_PREFIX}
-            REDBOT_DB_HOST: postgres
+            REDBOT_DB_HOST: localhost
             REDBOT_DB_USER: ${POSTGRES_USER}
             REDBOT_DB_PASS: ${POSTGRES_PASSWORD}
             REDBOT_DB_NAME: ${POSTGRES_DB}
@@ -131,6 +90,3 @@ services:
             DRSSWEB_BOT_REDIRECTURI: ${DISCORD_REDIRECT_URI}
             DRSSWEB_BOT_CLIENTID: ${DISCORD_CLIENT_ID}
             DRSSWEB_BOT_CLIENTSECRET: ${DISCORD_CLIENT_SECRET}
-
-volumes:
-    yourls:
